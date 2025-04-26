@@ -72,7 +72,6 @@ def expense_dashboard(request):
     if end_date:
         expenses = expenses.filter(date__lte=end_date)
 
-    # ---------------- Budget Calculation ----------------
     if start_date and end_date:
         start = datetime.strptime(start_date, "%Y-%m-%d")
         end = datetime.strptime(end_date, "%Y-%m-%d")
@@ -102,7 +101,6 @@ def expense_dashboard(request):
             date__month=current_month
         ).order_by('-date')
 
-    # ---------------- Calculations ----------------
     total_expenses = expenses.aggregate(Sum('amount'))['amount__sum'] or 0
     balance = total_budget - total_expenses
 
@@ -115,7 +113,6 @@ def expense_dashboard(request):
         for month in range(1, 13)
     ]
 
-    # ---------------- Handling Forms ----------------
     if request.method == 'POST':
         if 'add_expense' in request.POST:
             expense_form = ExpenseForm(request.POST)
@@ -140,7 +137,6 @@ def expense_dashboard(request):
         expense_form = ExpenseForm()
         budget_form = BudgetForm()
 
-    # ---------------- Context ----------------
     context = {
         'expenses': expenses,
         'budget': total_budget,
@@ -278,3 +274,55 @@ def update_note_view(request, note_id):
         form = NoteForm(instance=note)
 
     return render(request, 'edit_note.html', {'form': form, 'note_to_edit': note})
+
+#calendar part
+from django.shortcuts import render, redirect
+from django.http import JsonResponse
+from .models import CalendarEvent
+from django.contrib.auth.decorators import login_required
+import json
+from django.views.decorators.csrf import csrf_exempt
+
+@login_required
+def calendar_page(request):
+    return render(request, 'calendar.html')  # Use your HTML code here
+
+@login_required
+def get_events(request):
+    events = CalendarEvent.objects.filter(user=request.user)
+    events_data = [
+        {
+            'id': event.id,
+            'title': event.title,
+            'date': str(event.date),
+            'time': str(event.time),
+            'reminder': event.reminder,
+            'color': event.color
+        }
+        for event in events
+    ]
+    return JsonResponse(events_data, safe=False)
+
+@csrf_exempt
+@login_required
+def add_event(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        CalendarEvent.objects.create(
+            user=request.user,
+            title=data['title'],
+            date=data['date'],
+            time=data['time'],
+            reminder=data.get('reminder'),
+            color=data.get('color', '#6c63ff')
+        )
+        return JsonResponse({'message': 'Event added successfully!'})
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+
+@csrf_exempt
+@login_required
+def delete_event(request, event_id):
+    if request.method == 'DELETE':
+        CalendarEvent.objects.filter(id=event_id, user=request.user).delete()
+        return JsonResponse({'message': 'Event deleted successfully!'})
+    return JsonResponse({'error': 'Invalid request'}, status=400)

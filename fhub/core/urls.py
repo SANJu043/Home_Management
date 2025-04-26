@@ -23,4 +23,9 @@ urlpatterns = [
     path('notes/favorite/<int:note_id>/', views.toggle_favorite, name='favorite-note'),
     path('edit/<int:note_id>/', views.edit_note_view, name='edit-note'),
     path('update/<int:note_id>/', views.update_note_view, name='update-note'),
+
+    path('calendar/', views.calendar_page, name='calendar_page'),
+    path('api/events/', views.get_events, name='get_events'),
+    path('api/events/add/', views.add_event, name='add_event'),
+    path('api/events/delete/<int:event_id>/', views.delete_event, name='delete_event'),
 ]

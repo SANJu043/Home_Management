@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Management | Calendar</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background: #f5f5f5; }
+        .navbar { background: rgba(255, 255, 255, 0.95); padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); position: fixed; width: 100%; top: 0; z-index: 1000; }
+        .container { padding: 6rem 5% 2rem; display: flex; flex-wrap: wrap; gap: 2rem; }
+        .calendar-container { flex: 3; min-width: 300px; background: white; border-radius: 15px; padding: 2rem; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05); }
+        .sidebar { flex: 1; min-width: 250px; background: white; border-radius: 15px; padding: 1.5rem; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05); }
+        .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+        .calendar-day-header { text-align: center; padding: 1rem; background: #6c63ff; color: white; border-radius: 8px; }
+        .calendar-day { min-height: 120px; padding: 1rem; border: 2px solid #eee; border-radius: 8px; transition: all 0.3s; cursor: pointer; position: relative; }
+        .calendar-day.today { border: 2px solid #6c63ff; background: #f0f0ff; }
+        .calendar-day:hover { background: #f8f7ff; transform: translateY(-3px); }
+        .event-dot { width: 8px; height: 8px; background: #6c63ff; border-radius: 50%; margin: 2px; display: inline-block; }
+        .event-list { margin-top: 1rem; }
+        .event-item { background: #f8f7ff; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; }
+        .cta-btn { padding: 0.6rem 1rem; border: none; background: #6c63ff; color: white; border-radius: 8px; cursor: pointer; transition: background-color 0.3s; }
+        .cta-btn:hover { background-color: #574fcf; }
+        #eventForm { display: flex; flex-direction: column; gap: 1rem; margin-top: 1rem; }
+        #eventForm input, #eventForm select { padding: 0.8rem; border: 2px solid #eee; border-radius: 8px; font-size: 1rem; }
+        #eventForm input:focus, #eventForm select:focus { outline: none; border-color: #6c63ff; }
+        @media (max-width: 768px) {
+            .container { flex-direction: column; }
+            .sidebar { width: 100%; }
+        }
+        header {
+            background-color: rgb(105, 103, 246);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.8rem;
+        }
+
+        .home-btn {
+            background-color: rgb(105, 103, 246);
+            color: white;
+            border: 2px solid white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .home-btn:hover {
+            background-color: white;
+            color: rgb(105, 103, 246);
+            border-color: var(--primary-dark);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>{{ user.first_name }}'s Calendar</h1>
+        <a href="{% url 'home' %}" class="home-btn">Home</a>
+    </header>
+
+<div class="container">
+    <div class="calendar-container">
+        <div class="calendar-header">
+            <h2 id="monthYear"></h2>
+            <div class="month-navigation">
+                <button class="cta-btn" onclick="changeMonth(-1)"><i class="fas fa-chevron-left"></i></button>
+                <button class="cta-btn" onclick="changeMonth(1)"><i class="fas fa-chevron-right"></i></button>
+            </div>
+        </div>
+        <div class="calendar-grid" id="calendarGrid"></div>
+    </div>
+
+    <!-- Sidebar with Today's Events and Add Event Form -->
+    <div class="sidebar">
+        <div class="sidebar">
+            <h3>Today's Events</h3>
+            <div id="todayEvents" class="event-list"></div>
+        
+            <h3 style="margin-top: 2rem;">Selected Date Events</h3>
+            <div id="selectedDateEvents" class="event-list"></div>
+        
+            <h3 style="margin-top: 2rem;">Add New Event</h3>
+            <form id="eventForm">
+                <input type="text" name="title" placeholder="Event Title" required>
+                <input type="date" name="date" id="eventDate" required>
+                <input type="time" name="time" required>
+                <select name="reminder">
+                    <option value="">No Reminder</option>
+                    <option value="15 minutes">15 minutes before</option>
+                    <option value="30 minutes">30 minutes before</option>
+                    <option value="1 hour">1 hour before</option>
+                </select>
+                <input type="color" name="color" value="#6c63ff">
+                <button type="submit" class="cta-btn">Save Event</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+let currentDate = new Date();
+let selectedDate = null;
+let events = [];
+
+// Fetch events from Django backend
+async function fetchEvents() {
+    const response = await fetch('/api/events/');
+    events = await response.json();
+    generateCalendar();
+    showTodaysEvents();
+    if (selectedDate) {
+        showEventsForDate(selectedDate);
+    }
+}
+
+function generateCalendar() {
+    const calendarGrid = document.getElementById('calendarGrid');
+    calendarGrid.innerHTML = '';
+
+    const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    dayHeaders.forEach(day => {
+        calendarGrid.innerHTML += `<div class="calendar-day-header">${day}</div>`;
+    });
+
+    const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+    const lastDay = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+
+    for (let i = 0; i < firstDay.getDay(); i++) {
+        calendarGrid.innerHTML += `<div class="calendar-day other-month"></div>`;
+    }
+
+    const today = new Date();
+    for (let i = 1; i <= lastDay.getDate(); i++) {
+        const dateStr = `${currentDate.getFullYear()}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}-${i.toString().padStart(2, '0')}`;
+        const dayEvents = events.filter(event => event.date === dateStr);
+        const isToday = i === today.getDate() && currentDate.getMonth() === today.getMonth() && currentDate.getFullYear() === today.getFullYear();
+
+        calendarGrid.innerHTML += `
+            <div class="calendar-day ${isToday ? 'today' : ''}" data-date="${dateStr}">
+                ${i}
+                ${dayEvents.map(event => `<div class="event-dot" style="background: ${event.color || '#6c63ff'}"></div>`).join('')}
+            </div>`;
+    }
+
+    const totalCells = 42;
+    const remainingCells = totalCells - (firstDay.getDay() + lastDay.getDate());
+    for (let i = 1; i <= remainingCells; i++) {
+        calendarGrid.innerHTML += `<div class="calendar-day other-month"></div>`;
+    }
+
+    document.querySelectorAll('.calendar-day:not(.other-month)').forEach(day => {
+        day.addEventListener('click', () => {
+            selectedDate = day.dataset.date;
+            document.getElementById('eventDate').value = selectedDate;
+            showEventsForDate(selectedDate);
+        });
+    });
+}
+
+async function deleteEvent(eventId) {
+    const response = await fetch(`/api/events/delete/${eventId}/`, {
+        method: 'DELETE',
+        headers: { 'X-CSRFToken': getCSRFToken() }
+    });
+    if (response.ok) {
+        await fetchEvents();
+    } else {
+        alert('Error deleting event.');
+    }
+}
+
+function showEventsForDate(date) {
+    const selectedEvents = events.filter(event => event.date === date);
+    const selectedEventList = document.getElementById('selectedDateEvents');
+    selectedEventList.innerHTML = selectedEvents.length
+        ? selectedEvents.map(event => `
+            <div class="event-item" data-id="${event.id}">
+                <h4>${event.title}</h4>
+                <p>⏰ ${event.time} | ${event.location || ''}</p>
+                ${event.reminder ? `<p class="reminder">🔔 ${event.reminder}</p>` : ''}
+                <p>${event.description || ''}</p>
+                <div style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 0.5rem;">
+                    <button onclick="deleteEvent(${event.id})" class="cta-btn">Delete</button>
+                </div>
+            </div>
+        `).join('')
+        : '<p>No events for this day</p>';
+}
+
+function showTodaysEvents() {
+    const todayStr = new Date().toISOString().split('T')[0];
+    const todaysEvents = events.filter(event => event.date === todayStr);
+    const todayEventsList = document.getElementById('todayEvents');
+    todayEventsList.innerHTML = todaysEvents.length
+        ? todaysEvents.map(event => `
+            <div class="event-item">
+                <h4>${event.title}</h4>
+                <p>⏰ ${event.time} | ${event.location || ''}</p>
+                <p>${event.description || ''}</p>
+            </div>`).join('')
+        : '<p>No events today.</p>';
+}
+
+
+document.getElementById('eventForm').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    const newEvent = {
+        title: formData.get('title'),
+        date: formData.get('date'),
+        time: formData.get('time'),
+        reminder: formData.get('reminder'),
+        color: formData.get('color')
+    };
+
+    const response = await fetch('/api/events/add/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCSRFToken() },
+        body: JSON.stringify(newEvent)
+    });
+
+    if (response.ok) {
+        await fetchEvents();
+        this.reset();
+    } else {
+        alert('Error adding event.');
+    }
+});
+
+function getCSRFToken() {
+    const name = 'csrftoken';
+    const cookies = document.cookie.split(';');
+    for (let cookie of cookies) {
+        cookie = cookie.trim();
+        if (cookie.startsWith(name + '=')) {
+            return cookie.substring(name.length + 1);
+        }
+    }
+    return '';
+}
+
+function changeMonth(direction) {
+    currentDate.setMonth(currentDate.getMonth() + direction);
+    document.getElementById('monthYear').textContent = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(currentDate);
+    generateCalendar();
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+    document.getElementById('monthYear').textContent = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(currentDate);
+    await fetchEvents();
+});
+</script>
+</body>
+</html>
