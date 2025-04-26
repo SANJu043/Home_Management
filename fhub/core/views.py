@@ -79,6 +79,22 @@ def expense_dashboard(request):
     if end_date:
         expenses = expenses.filter(date__lte=end_date)
 
+    if start_date and end_date:
+        start = datetime.strptime(start_date, "%Y-%m-%d")
+        end = datetime.strptime(end_date, "%Y-%m-%d")
+        budget = Budget.objects.filter(
+            user=request.user,
+            year__gte=start.year,
+            month__gte=start.month,
+            year__lte=end.year,
+            month__lte=end.month
+        ).aggregate(total_budget=Sum('amount'))['total_budget'] or 0
+    else:
+        # If no filter selected, default to current month
+        current_year = date.today().year
+        current_month = date.today().month
+        budget = Budget.objects.filter(user=request.user, year=current_year, month=current_month).aggregate(total_budget=Sum('amount'))['total_budget'] or 0
+
     
 
     budget = Budget.objects.filter(user=request.user, year=filter_year, month=filter_month).first()
