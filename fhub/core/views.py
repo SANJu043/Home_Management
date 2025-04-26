@@ -49,11 +49,9 @@ def logout_view(request):
 
 
 #expenses part
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
 from .models import Expense, Budget
 from .forms import ExpenseForm, BudgetForm
-from django.db.models import Sum
+from django.db.models import Sum, Q
 from datetime import date
 from datetime import datetime, date
 import calendar
@@ -68,47 +66,56 @@ def expense_dashboard(request):
     current_year = date.today().year
     current_month = date.today().month
 
+    # Filter expenses if start and end dates provided
     if start_date:
         expenses = expenses.filter(date__gte=start_date)
-        filter_date = datetime.strptime(start_date, "%Y-%m-%d")
-        filter_year = filter_date.year
-        filter_month = filter_date.month
-    else:
-        filter_year = date.today().year
-        filter_month = current_month
     if end_date:
         expenses = expenses.filter(date__lte=end_date)
 
+    # ---------------- Budget Calculation ----------------
     if start_date and end_date:
         start = datetime.strptime(start_date, "%Y-%m-%d")
         end = datetime.strptime(end_date, "%Y-%m-%d")
-        budget = Budget.objects.filter(
-            user=request.user,
-            year__gte=start.year,
-            month__gte=start.month,
-            year__lte=end.year,
-            month__lte=end.month
-        ).aggregate(total_budget=Sum('amount'))['total_budget'] or 0
+
+        # Convert year & month into comparable values
+        start_value = start.year * 12 + start.month
+        end_value = end.year * 12 + end.month
+
+        # Filter budgets correctly between start and end month/year
+        budgets = Budget.objects.filter(user=request.user)
+        total_budget = sum(
+            b.amount for b in budgets
+            if (b.year * 12 + b.month) >= start_value and (b.year * 12 + b.month) <= end_value
+        )
     else:
-        # If no filter selected, default to current month
-        current_year = date.today().year
-        current_month = date.today().month
-        budget = Budget.objects.filter(user=request.user, year=current_year, month=current_month).aggregate(total_budget=Sum('amount'))['total_budget'] or 0
+        # Default to current month budget and expenses
+        total_budget = Budget.objects.filter(
+            user=request.user,
+            year=current_year,
+            month=current_month
+        ).aggregate(total_budget=Sum('amount'))['total_budget'] or 0
 
-    
+        # Also filter expenses to current month if no filter is given
+        expenses = Expense.objects.filter(
+            user=request.user,
+            date__year=current_year,
+            date__month=current_month
+        ).order_by('-date')
 
-    budget = Budget.objects.filter(user=request.user, year=filter_year, month=filter_month).first()
+    # ---------------- Calculations ----------------
     total_expenses = expenses.aggregate(Sum('amount'))['amount__sum'] or 0
-    balance = budget.amount - total_expenses if budget else 0
+    balance = total_budget - total_expenses
 
     category_summary = expenses.values('category').annotate(total=Sum('amount')).order_by('category')
 
     month_labels = [calendar.month_name[i] for i in range(1, 13)]
     month_totals = [
-        Expense.objects.filter(user=request.user, date__year=current_year, date__month=month).aggregate(Sum('amount'))['amount__sum'] or 0
+        Expense.objects.filter(user=request.user, date__year=current_year, date__month=month)
+        .aggregate(Sum('amount'))['amount__sum'] or 0
         for month in range(1, 13)
     ]
 
+    # ---------------- Handling Forms ----------------
     if request.method == 'POST':
         if 'add_expense' in request.POST:
             expense_form = ExpenseForm(request.POST)
@@ -133,9 +140,10 @@ def expense_dashboard(request):
         expense_form = ExpenseForm()
         budget_form = BudgetForm()
 
+    # ---------------- Context ----------------
     context = {
         'expenses': expenses,
-        'budget': budget.amount if budget else 0,
+        'budget': total_budget,
         'total_expenses': total_expenses,
         'balance': balance,
         'expense_form': expense_form,
@@ -144,7 +152,7 @@ def expense_dashboard(request):
         'month_labels': month_labels,
         'month_totals': month_totals,
         'start_date': start_date,
-        'end_date': end_date, 
+        'end_date': end_date,
     }
     return render(request, 'expenses.html', context)
 
@@ -197,3 +205,76 @@ def toggle_task_status(request, task_id):
     task.status = 'completed' if task.status != 'completed' else 'todo'
     task.save()
     return redirect('todo_list')
+
+
+#notes part
+from .models import Note
+from .forms import NoteForm
+from django.contrib import messages
+
+@login_required
+def notes_dashboard(request):
+    notes = Note.objects.filter(user=request.user, archived=False).order_by('-pinned', '-updated_at')
+    archived_notes = Note.objects.filter(user=request.user, archived=True)
+
+    if request.method == 'POST':
+        form = NoteForm(request.POST)
+        if form.is_valid():
+            note = form.save(commit=False)
+            note.user = request.user
+            note.save()
+            return redirect('notes-dashboard')
+    else:
+        form = NoteForm()
+
+    context = {
+        'notes': notes,
+        'form': form,
+    }
+    return render(request, 'notes.html', context)
+
+@login_required
+def delete_note(request, note_id):
+    note = get_object_or_404(Note, id=note_id, user=request.user)
+    note.delete()
+    return redirect('notes-dashboard')
+
+@login_required
+def toggle_pin(request, note_id):
+    note = get_object_or_404(Note, id=note_id, user=request.user)
+    note.pinned = not note.pinned
+    note.save()
+    return redirect('notes-dashboard')
+@login_required
+def toggle_favorite(request, note_id):
+    note = get_object_or_404(Note, id=note_id, user=request.user)
+    note.is_favorite = not note.is_favorite
+    note.save()
+    return redirect('notes-dashboard')
+
+def edit_note_view(request, note_id):
+    note = get_object_or_404(Note, id=note_id)
+
+    if request.method == 'POST':
+        form = NoteForm(request.POST, instance=note)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Note updated successfully!')
+            return redirect('notes')
+    else:
+        form = NoteForm(instance=note)
+
+    return render(request, 'edit_note.html', {'form': form, 'note_to_edit': note})
+
+def update_note_view(request, note_id):
+    note = get_object_or_404(Note, id=note_id)
+    if request.method == 'POST':
+        form = NoteForm(request.POST, instance=note)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Note updated successfully!')
+            return redirect('notes')
+    else:
+        form = NoteForm(instance=note)
+
+    return render(request, 'edit_note.html', {'form': form, 'note_to_edit': note})

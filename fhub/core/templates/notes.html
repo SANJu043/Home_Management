@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PersonalHub - My Notes</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <style>
+    :root {
+        --primary-color: #6c63ff;
+        --primary-dark: #564fd8;
+        --background: #f5f7fb;
+        --card-bg: #ffffff;
+        --text-color: #333;
+        --accent-color: #ffb347;
+        --box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        --border-radius: 12px;
+      }
+  
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Poppins', sans-serif;
+        background-color: var(--background);
+        color: var(--text-color);
+      }
+  
+      header {
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+        color: white;
+        padding: 1rem 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: var(--box-shadow);
+      }
+  
+      header h1 {
+        margin: 0;
+        font-size: 1.8rem;
+      }
+  
+      .logout-btn {
+        background-color: white;
+        color: var(--primary-color);
+        border: 2px solid white;
+        padding: 0.5rem 1rem;
+        border-radius: var(--border-radius);
+        font-weight: 500;
+        text-decoration: none;
+        transition: background-color 0.3s, color 0.3s, box-shadow 0.3s;
+      }
+  
+      .logout-btn:hover {
+        background-color: var(--primary-dark);
+        color: white;
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+      }
+  
+      .container {
+        display: flex;
+        gap: 2rem;
+        max-width: 1200px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+        flex-wrap: wrap;
+      }
+  
+      .notes-section {
+        flex: 2;
+        min-width: 0%;
+      }
+  
+      .note-form {
+        flex: 1;
+        background-color: var(--card-bg);
+        padding: 1.5rem;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        min-width: 300px;
+        max-height: fit-content;
+      }
+  
+      .note-form h2 {
+        margin-bottom: 1rem;
+      }
+  
+      .note-form input,
+      .note-form textarea,
+      .note-form select,
+      .note-form button {
+        width: 80%;
+        margin-bottom: 1rem;
+        padding: 0.8rem;
+        border: 1px solid #ddd;
+        border-radius: var(--border-radius);
+        font-family: inherit;
+        font-size: 1rem;
+      }
+  
+      .note-form button {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        cursor: pointer;
+        transition: background 0.3s ease;
+      }
+  
+      .note-form button:hover {
+        background-color: var(--primary-dark);
+      }
+  
+      .notes-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 1.5rem;
+      }
+  
+      .note-card {
+        padding: 1rem;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        background-color: var(--card-bg);
+        position: relative;
+        transition: transform 0.3s ease;
+        border-left: 6px solid var(--primary-color);
+        overflow-x: auto;
+        min-height: 120px;
+        cursor: pointer;
+      }
+  
+      .note-card[data-color="red"] { border-left-color: #ff6b6b; }
+      .note-card[data-color="blue"] { border-left-color: #4dabf7; }
+      .note-card[data-color="yellow"] { border-left-color: #ffd43b; }
+      .note-card[data-color="green"] { border-left-color: #51cf66; }
+  
+      .note-card:hover {
+        transform: translateY(-5px);
+      }
+  
+      .note-title {
+        font-weight: 600;
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+      }
+  
+      .note-content {
+        font-size: 0.95rem;
+        margin-bottom: 1rem;
+      }
+  
+      .note-meta {
+        font-size: 0.8rem;
+        color: gray;
+      }
+  
+      .actions {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        display: flex;
+        gap: 0.6rem;
+      }
+  
+      .actions a {
+        color: var(--primary-color);
+        text-decoration: none;
+        font-size: 1.1rem;
+        transition: transform 0.2s ease;
+      }
+  
+      .actions a:hover {
+        transform: scale(1.2);
+      }
+  
+      .starred {
+        color: var(--accent-color);
+      }
+  
+      .no-notes {
+        text-align: center;
+        color: gray;
+        font-size: 1.1rem;
+        margin-top: 2rem;
+      }
+  
+      /* Modal Styles */
+      .modal {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%); /* Center the modal */
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+        justify-content: center;
+        align-items: center;
+        z-index: 1000; /* Keeps modal on top */
+        padding: 2rem;
+      }
+  
+      .modal-content {
+        background-color: var(--card-bg);
+        padding: 2rem;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        max-width: 600px;
+        width: 100%;
+        max-height: 80vh;
+        overflow-y: auto;
+        position: relative;
+        transition: transform 0.3s ease;
+        transform: scale(0.8); /* Start the modal smaller */
+      }
+  
+      .modal.open .modal-content {
+        transform: scale(1); /* Transition to normal size */
+      }
+  
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+      }
+  
+      .modal-header h2 {
+        margin: 0;
+      }
+  
+      .close {
+        font-size: 1.5rem;
+        color: #333;
+        cursor: pointer;
+      }
+  
+      @media screen and (max-width: 768px) {
+        .container {
+          flex-direction: column;
+        }
+  
+        .note-form {
+          order: -1;
+        }
+      }
+    /* Your existing styles */
+    /* Add new styles for modal and buttons */
+    .edit-btn {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: var(--border-radius);
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .edit-btn:hover {
+      background-color: var(--primary-dark);
+    }
+
+    /* Other existing styles */
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🌟 Hello, {{ user.first_name }}</h1>
+    <a href="{% url 'home' %}" class="logout-btn">Home</a>
+  </header>
+
+  <div class="container">
+    <div class="notes-section">
+      <h2>Your Notes</h2>
+      <div class="notes-grid">
+        {% for note in notes %}
+        <div class="note-card" data-color="{{ note.color }}" onclick="openModal('{{ note.id }}', '{{ note.title|escapejs }}', '{{ note.content|escapejs }}', '{{ note.created_at|date:"M d ,Y H:i" }}')">
+          <div class="actions">
+            <a href="{% url 'favorite-note' note.id %}" title="Favorite">
+              {% if note.is_favorite %}
+              <i class="fas fa-star starred"></i>
+              {% else %}
+              <i class="far fa-star"></i>
+              {% endif %}
+            </a>
+            <a href="{% url 'delete-note' note.id %}" title="Delete"><i class="fas fa-trash"></i></a>
+          </div>
+          <div class="note-title">{{ note.title }}</div>
+          <div class="note-content">{{ note.content|truncatechars:100 }}</div>
+          <div class="note-meta">Created: {{ note.created_at|date:"M d, Y H:i" }}</div>
+        </div>
+        {% empty %}
+        <p class="no-notes">No notes yet. Start by adding one on the right!</p>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="note-form">
+      <h2>Add a New Note</h2>
+      <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Save Note</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div id="noteModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 id="noteTitle"></h2>
+        <span class="close" onclick="closeModal()">&times;</span>
+      </div>
+      <p id="noteContent"></p>
+      <p id="noteDate"></p>
+
+      <!-- Edit Button in Modal -->
+      <button class="edit-btn" onclick="editNote()">Edit Note</button>
+
+      <!-- Edit Note Form -->
+      <div id="editForm" style="display:none;">
+        <form method="POST" id="noteEditForm">
+          {% csrf_token %}
+          <input type="hidden" id="noteId" name="note_id">
+          <label for="editTitle">Title:</label>
+          <input type="text" id="editTitle" name="title" required>
+
+          <label for="editContent">Content:</label>
+          <textarea id="editContent" name="content" required></textarea>
+
+          <button type="submit">Save Changes</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function openModal(id, title, content, date) {
+      document.getElementById('noteTitle').innerText = title;
+      document.getElementById('noteContent').innerText = content;
+      document.getElementById('noteDate').innerText = "Created on: " + date;
+      document.getElementById('noteModal').style.display = "flex";
+      document.getElementById('noteModal').classList.add('open'); // Trigger animation
+      document.getElementById('noteId').value = id;
+      document.getElementById('editTitle').value = title;
+      document.getElementById('editContent').value = content;
+    }
+
+    function closeModal() {
+      document.getElementById('noteModal').style.display = "none";
+      document.getElementById('noteModal').classList.remove('open');
+    }
+
+    function editNote() {
+      document.getElementById('editForm').style.display = "block"; // Show the edit form
+    }
+  </script>
+</body>
+</html>

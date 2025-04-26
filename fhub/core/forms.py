@@ -53,3 +53,16 @@ class TaskForm(forms.ModelForm):
             'status': forms.Select(attrs={'class': 'form-select'}),
             'member': forms.TextInput(attrs={'placeholder': 'You can use this for date or any tag', 'class': 'add-task-input'}),
         }
+
+
+#notes part
+from .models import Note
+
+class NoteForm(forms.ModelForm):
+    class Meta:
+        model = Note
+        fields = ['title', 'content', 'pinned', 'is_favorite', 'color']
+        widgets = {
+            'content': forms.Textarea(attrs={'rows': 5, 'placeholder': 'Write your note here...'}),
+            'color': forms.Select(choices=[('red', 'Red'), ('blue', 'Blue'), ('yellow', 'Yellow'), ('green', 'Green')]),
+        }

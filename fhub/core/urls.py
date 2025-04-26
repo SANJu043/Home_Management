@@ -4,13 +4,23 @@ from . import views
 urlpatterns = [
     path('', views.land_view, name='land'),
     path('home/', views.home_views, name='home'),
+
     path('expenses/', views.expense_dashboard, name='expense-dashboard'),
     path('expenses/delete/<int:expense_id>/', views.delete_expense, name='delete-expense'),
+
     path('login/', views.login_view, name='login'),
     path('signup/', views.signup_view, name='signup'),
     path('logout/', views.logout_view, name = 'logout'),
+
     path('todo/', views.todo_list, name='todo_list'),
     path('add/', views.add_task, name='add_task'),
     path('delete/<int:task_id>/', views.delete_task, name='delete_task'),
     path('toggle/<int:task_id>/', views.toggle_task_status, name='toggle_task_status'),
+
+    path('notes/', views.notes_dashboard, name='notes-dashboard'),
+    path('notes/delete/<int:note_id>/', views.delete_note, name='delete-note'),
+    path('notes/pin/<int:note_id>/', views.toggle_pin, name='pin-note'),
+    path('notes/favorite/<int:note_id>/', views.toggle_favorite, name='favorite-note'),
+    path('edit/<int:note_id>/', views.edit_note_view, name='edit-note'),
+    path('update/<int:note_id>/', views.update_note_view, name='update-note'),
 ]

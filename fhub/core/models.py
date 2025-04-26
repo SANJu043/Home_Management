@@ -62,3 +62,30 @@ class Task(models.Model):
 
     def __str__(self):
         return self.text
+    
+#notes part
+
+class Note(models.Model):
+    COLOR_CHOICES = [
+        ('default', 'Default'),
+        ('red', 'Red'),
+        ('blue', 'Blue'),
+        ('yellow', 'Yellow'),
+        ('green', 'Green'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    title = models.CharField(max_length=255)
+    content = models.TextField()
+    pinned = models.BooleanField(default=False)
+    archived = models.BooleanField(default=False)
+    is_favorite = models.BooleanField(default=False)
+    color = models.CharField(max_length=20, choices=COLOR_CHOICES, default='default')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-pinned', '-updated_at']
+
+    def __str__(self):
+        return self.title
