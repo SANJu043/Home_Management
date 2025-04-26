@@ -1,0 +1,215 @@
+<!-- signup.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Family Hub - Signup</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #6c63ff;
+      --primary-dark: #564fd8;
+      --error-color: #ff4444;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+                  url('https://images.unsplash.com/photo-1600585154526-990dced4db0d') center/cover no-repeat;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .auth-container {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 2.5rem;
+      border-radius: 20px;
+      max-width: 450px;
+      width: 90%;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+
+    .auth-container h1 {
+      color: var(--primary-color);
+      margin-bottom: 2rem;
+    }
+
+    .input-group {
+      position: relative;
+      margin-bottom: 1.5rem;
+    }
+
+    .input-group i {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #666;
+    }
+
+    .auth-form input {
+      width: 80%;
+      padding: 0.8rem 2.5rem;
+      border: 2px solid #eee;
+      border-radius: 10px;
+      font-size: 1rem;
+      transition: border-color 0.3s ease;
+    }
+
+    .auth-form input:focus {
+      border-color: var(--primary-color);
+      outline: none;
+    }
+
+    .auth-form button {
+      background: var(--primary-color);
+      color: white;
+      padding: 1rem;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .auth-form button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(108, 99, 255, 0.4);
+    }
+
+    .error-message {
+      color: var(--error-color);
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+    }
+
+    .switch-auth {
+      margin-top: 1.5rem;
+    }
+
+    .switch-auth a {
+      color: var(--primary-color);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .password-strength {
+      margin-top: 0.5rem;
+      height: 4px;
+      background: #eee;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .strength-bar {
+      height: 100%;
+      width: 0;
+      background: var(--primary-color);
+      transition: width 0.3s ease;
+    }
+
+    .name-fields {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+    }
+
+    .name-fields .input-group {
+        flex: 1;
+        margin-bottom: 1.5rem;
+    }
+    .name-fields input {
+        width: 60%;
+    }
+  </style>
+</head>
+<body>
+  <div class="auth-container">
+    <h1>Create Your <a href= {% url 'land' %} style="text-decoration: none; color:red;">LifeFlow</a> Account</h1>
+    <form method="POST" action="{% url 'signup' %}" class="auth-form">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+      {% if form.errors %}
+        <div class="error-message">Please correct the errors below.</div>
+      {% endif %}
+
+      <div class="input-group">
+        <i class="fas fa-user"></i>
+        {{ form.username }}
+        <div class="error-message">{{ form.username.errors }}</div>
+      </div>
+      <div class="name-fields">
+        <div class="input-group">
+            <i class="fas fa-user"></i>
+            {{ form.first_name }}
+            <div class="error-message">{{ form.first_name.errors }}</div>
+        </div>
+        <div class="input-group">
+            <i class="fas fa-user"></i>
+            {{ form.last_name }}
+            <div class="error-message">{{ form.last_name.errors }}</div>
+        </div>
+      </div>
+      <div class="input-group">
+        <i class="fas fa-calendar-alt"></i>
+        {{ form.date_of_birth }}
+        <div class="error-message">{{ form.date_of_birth.errors }}</div>
+      </div>
+      <div class="input-group">
+        <i class="fas fa-envelope"></i>
+        {{ form.email }}
+        <div class="error-message">{{ form.email.errors }}</div>
+      </div>
+      <div class="input-group">
+        <i class="fas fa-lock"></i>
+        {{ form.password1 }}
+        <div class="error-message">{{ form.password1.errors }}</div>
+      </div>
+      <div class="password-strength">
+        <div class="strength-bar" id="strengthBar"></div>
+      </div>
+      <div class="input-group">
+        <i class="fas fa-lock"></i>
+        {{ form.password2 }}
+        <div class="error-message">{{ form.password2.errors }}</div>
+      </div>
+
+      <button type="submit">Create Account</button>
+    </form>
+
+    <div class="switch-auth">
+      Already have an account? <a href="{% url 'login' %}">Login Here</a>
+    </div>
+  </div>
+
+  <script>
+    // Password strength indicator
+    const passwordInput = document.getElementById('id_password1');
+    const strengthBar = document.getElementById('strengthBar');
+
+    if (passwordInput) {
+      passwordInput.addEventListener('input', function (e) {
+        const strength = calculateStrength(e.target.value);
+        strengthBar.style.width = strength + '%';
+      });
+    }
+
+    function calculateStrength(password) {
+      let strength = 0;
+      if (password.length >= 6) strength += 25;
+      if (password.match(/[A-Z]/)) strength += 25;
+      if (password.match(/[0-9]/)) strength += 25;
+      if (password.match(/[^A-Za-z0-9]/)) strength += 25;
+      return Math.min(strength, 100);
+    }
+  </script>
+</body>
+</html>

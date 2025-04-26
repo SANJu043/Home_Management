@@ -1,0 +1,151 @@
+<!-- login.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Family Hub - Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #6c63ff;
+            --primary-dark: #564fd8;
+            --error-color: #ff4444;
+            --input-bg: #f9f9f9;
+            --input-border: #ddd;
+            --input-border-focus: var(--primary-color);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+                        url('https://images.unsplash.com/photo-1600585154526-990dced4db0d') center/cover no-repeat;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .auth-container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2.5rem;
+            border-radius: 20px;
+            max-width: 450px;
+            width: 90%;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .auth-container h1 {
+            color: var(--primary-color);
+            margin-bottom: 2rem;
+            font-weight: 600;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 1.8rem;
+        }
+
+        .input-group i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+        }
+
+        .auth-form input {
+            width: 80%;
+            padding: 0.9rem 2.8rem;
+            border: 2px solid var(--input-border);
+            border-radius: 12px;
+            font-size: 1rem;
+            background-color: var(--input-bg);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .auth-form input:focus {
+            border-color: var(--input-border-focus);
+            outline: none;
+            box-shadow: 0 0 8px rgba(108, 99, 255, 0.3);
+        }
+
+        .auth-form button {
+            background: var(--primary-color);
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.05rem;
+            font-weight: 500;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            letter-spacing: 0.5px;
+        }
+
+        .auth-form button:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(108, 99, 255, 0.4);
+        }
+
+        .error-message {
+            color: var(--error-color);
+            font-size: 0.9rem;
+            margin-top: 0.3rem;
+            text-align: left;
+        }
+
+        .switch-auth {
+            margin-top: 1.8rem;
+        }
+
+        .switch-auth a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .switch-auth a:hover {
+            color: var(--primary-dark);
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <h1><a href= {% url 'land' %} style="text-decoration: none; color:red;">LifeFlow</a> Login</h1>
+        {% if form.errors %}
+        <div class="error-message">Invalid username or password. Please try again.</div>
+        {% endif %}
+
+        <form method="POST" id="loginForm" class="auth-form">
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+            <div class="error-message">{{ form.non_field_errors }}</div>
+            {% endif %}
+        
+            <div class="input-group">
+                <i class="fas fa-envelope"></i>
+                {{ form.email }}
+                <div class="error-message">{{ form.email.errors }}</div>
+            </div>
+            <div class="input-group">
+                <i class="fas fa-lock"></i>
+                {{ form.password }}
+                <div class="error-message">{{ form.password.errors }}</div>
+            </div>
+            <button type="submit">Login</button>
+        </form>
+
+        <div class="switch-auth">
+            New to Family Hub? <a href="{% url 'signup' %}">Create Account</a>
+        </div>
+    </div>
+</body>
+</html>

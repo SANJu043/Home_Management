@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Tracker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        header {
+            background-color: rgb(105, 103, 246);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.8rem;
+        }
+
+        .home-btn {
+            background-color: rgb(105, 103, 246);
+            color: white;
+            border: 2px solid white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .home-btn:hover {
+            background-color: white;
+            color: rgb(105, 103, 246);
+            border-color: var(--primary-dark);
+        }
+
+        .container {
+            padding: 6rem 5% 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header Styles */
+        .expense-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .expense-header h1 {
+            color: #2a2a2a;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .expense-header p {
+            color: #666;
+        }
+
+        /* Summary Cards */
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .summary-card h3 {
+            color: #666;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-card .amount {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #2a2a2a;
+        }
+
+        .summary-card.budget .amount {
+            color: #6c63ff;
+        }
+
+        .summary-card.expenses .amount {
+            color: #ff4444;
+        }
+
+        .summary-card.balance .amount {
+            color: #00C851;
+        }
+
+        /* Main Content */
+        .expense-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 900px) {
+            .expense-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Expense Form */
+        .expense-form-container {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            height: fit-content;
+        }
+
+        .expense-form {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            margin-bottom: 0.5rem;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .form-group input, 
+        .form-group select {
+            padding: 0.8rem;
+            border: 2px solid #eee;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus, 
+        .form-group select:focus {
+            outline: none;
+            border-color: #6c63ff;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .submit-btn {
+            background: #6c63ff;
+            color: white;
+            padding: 1rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-top: 0.5rem;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108, 99, 255, 0.3);
+        }
+
+        /* Budget Form */
+        .budget-form {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 2px solid #f0f0f0;
+        }
+
+        /* Charts Section */
+        .charts-container {
+            display: grid;
+            gap: 2rem;
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .chart-card h3 {
+            color: #2a2a2a;
+            margin-bottom: 1rem;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        /* Expense List */
+        .expense-list-container {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .expense-list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .expense-list-header h3 {
+            color: #2a2a2a;
+        }
+
+        .filter-controls {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .filter-controls select {
+            padding: 0.5rem;
+            border: 2px solid #eee;
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+
+        .expense-list {
+            list-style: none;
+        }
+
+        .expense-item {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            padding: 1rem 0;
+            border-bottom: 1px solid #f0f0f0;
+            align-items: center;
+        }
+
+        .expense-item:last-child {
+            border-bottom: none;
+        }
+
+        .expense-item-header {
+            font-weight: 600;
+            color: #666;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .expense-category {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            background: #f0f0ff;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: #6c63ff;
+        }
+
+        .expense-amount {
+            font-weight: 600;
+        }
+
+        .expense-date {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .delete-btn {
+            color: #ff4444;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .expense-item {
+                grid-template-columns: 1fr 1fr;
+                gap: 0.5rem;
+            }
+            
+            .expense-item-header {
+                display: none;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>{{ user.first_name }}'s Expenses</h1>
+        <a href="{% url 'home' %}" class="home-btn">Home</a>
+    </header>
+
+    <div class="expense-form-container">
+        <h3>Filter Expenses by Date Range</h3>
+        <form method="get">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="start_date">Start Date:</label>
+                    <input type="date" name="start_date" id="start_date" value="{{ start_date }}" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="end_date">End Date:</label>
+                    <input type="date" name="end_date" id="end_date" value="{{ end_date }}" class="form-control">
+                </div>
+            </div>
+            <button type="submit" class="submit-btn">Filter</button>
+            <a href="{% url 'expense-dashboard' %}" class="submit-btn" style="background-color: #ff4444;">Clear Filter</a>
+        </form>
+    </div>
+    
+    
+    <div class="container">
+        <div class="expense-header">
+            <h1>Expense Tracker</h1>
+            <p>Monitor spending, set budgets, and visualize your finances</p>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="summary-cards">
+            <div class="summary-card budget">
+                <h3>Monthly Budget</h3>
+                <div class="amount">${{ budget }}</div>
+            </div>
+            <div class="summary-card expenses">
+                <h3>Total Expenses</h3>
+                <div class="amount">${{ total_expenses }}</div>
+            </div>
+            <div class="summary-card balance">
+                <h3>Remaining Balance</h3>
+                <div class="amount">${{ balance }}</div>
+            </div>
+        </div>        
+
+        <!-- Main Content -->
+        <div class="expense-content">
+            <!-- Left Column -->
+            <div class="expense-forms">
+                <!-- Add Expense Form -->
+                <div class="expense-form-container">
+                    <h3>Add New Expense</h3>
+                    <form method="POST">
+                        {% csrf_token %}
+                        {{ expense_form.non_field_errors }}
+                        <div class="form-group">
+                            <label for="{{ expense_form.description.id_for_label }}">Description</label>
+                            {{ expense_form.description }}
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="{{ expense_form.amount.id_for_label }}">Amount</label>
+                                {{ expense_form.amount }}
+                            </div>
+                            <div class="form-group">
+                                <label for="{{ expense_form.category.id_for_label }}">Category</label>
+                                {{ expense_form.category }}
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="{{ expense_form.date.id_for_label }}">Date</label>
+                                {{ expense_form.date }}
+                            </div>
+                            <div class="form-group">
+                                <label for="{{ expense_form.paid_by.id_for_label }}">Paid By</label>
+                                {{ expense_form.paid_by }}
+                            </div>
+                        </div>
+                        <button type="submit" name="add_expense" class="submit-btn">Add Expense</button>
+                    </form>
+                </div>
+
+                <!-- Set Budget Form -->
+                <div class="expense-form-container budget-form">
+                    <h3>Set Monthly Budget (Year & Month)</h3>
+                    <form method="POST">
+                        {% csrf_token %}
+                        {{ budget_form.non_field_errors }}
+                        <div class="form-group">
+                            <label for="{{ budget_form.year.id_for_label }}">Year</label>
+                            {{ budget_form.year }}
+                        </div>
+                        <div class="form-group">
+                            <label for="{{ budget_form.month.id_for_label }}">Month</label>
+                            {{ budget_form.month }}
+                        </div>
+                        <div class="form-group">
+                            <label for="{{ budget_form.amount.id_for_label }}">Budget Amount ($)</label>
+                            {{ budget_form.amount }}
+                        </div>
+                        <button type="submit" name="set_budget" class="submit-btn">Set Budget</button>
+                    </form>
+                </div>
+                             
+            </div>
+
+            <!-- Right Column (Optional: You can add charts here) -->
+            <div class="charts-container">
+                <!-- Category-wise Chart -->
+                <div class="chart-card">
+                    <h3>Spending by Category</h3>
+                    <div class="chart-container">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Monthly-wise Bar Chart -->
+                <div class="chart-card">
+                    <h3>Monthly Spending Trend</h3>
+                    <div class="chart-container">
+                        <canvas id="monthlyChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Expense List -->
+        <div class="expense-list-container">
+            <div class="expense-list-header">
+                <h3>Recent Expenses</h3>
+            </div>
+            <ul class="expense-list">
+                <li class="expense-item expense-item-header">
+                    <div>Description</div>
+                    <div>Category</div>
+                    <div>Amount</div>
+                    <div>Date</div>
+                    <div>Action</div>
+                </li>
+                {% for expense in expenses %}
+                <li class="expense-item">
+                    <div>{{ expense.description }}</div>
+                    <div><span class="expense-category">{{ expense.category }}</span></div>
+                    <div class="expense-amount">{{ expense.amount }}</div>
+                    <div class="expense-date">{{ expense.date }}</div>
+                    <form method="POST" action="{% url 'delete-expense' expense.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="delete-btn"><i class="fas fa-trash"></i></button>
+                    </form>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <!-- Chart.js scripts (optional for charts) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Category-wise Chart
+            const categoryLabels = [
+                {% for category in category_summary %}
+                    '{{ category.category }}',
+                {% endfor %}
+            ];
+            const categoryData = [
+                {% for category in category_summary %}
+                    {{ category.total }},
+                {% endfor %}
+            ];
+    
+            const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+            new Chart(categoryCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: categoryLabels,
+                    datasets: [{
+                        data: categoryData,
+                        backgroundColor: [
+                            '#6c63ff', '#4bc0c0', '#ffcd56', '#ff6384',
+                            '#36a2eb', '#ff9f40', '#8e44ad', '#2ecc71'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'right' }
+                    }
+                }
+            });
+    
+            // Monthly-wise Bar Chart
+            const monthLabels = [
+                {% for label in month_labels %}
+                    '{{ label }}',
+                {% endfor %}
+            ];
+            const monthData = [
+                {% for amount in month_totals %}
+                    {{ amount }},
+                {% endfor %}
+            ];
+    
+            const monthlyCtx = document.getElementById('monthlyChart').getContext('2d');
+            new Chart(monthlyCtx, {
+                type: 'bar',
+                data: {
+                    labels: monthLabels,
+                    datasets: [{
+                        label: 'Monthly Spending',
+                        data: monthData,
+                        backgroundColor: '#6c63ff',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
