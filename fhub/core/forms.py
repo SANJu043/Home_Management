@@ -39,3 +39,17 @@ class BudgetForm(forms.ModelForm):
     class Meta:
         model = Budget
         fields = ['year', 'month', 'amount']
+
+#todo part
+from .models import Task
+
+class TaskForm(forms.ModelForm):
+    class Meta:
+        model = Task
+        fields = ['text', 'priority', 'status', 'member']
+        widgets = {
+            'text': forms.TextInput(attrs={'placeholder': 'Add new task...', 'class': 'add-task-input'}),
+            'priority': forms.Select(attrs={'class': 'form-select'}),
+            'status': forms.Select(attrs={'class': 'form-select'}),
+            'member': forms.TextInput(attrs={'placeholder': 'You can use this for date or any tag', 'class': 'add-task-input'}),
+        }

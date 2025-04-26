@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Family Hub | To-Do List</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        header {
+            background-color: rgb(105, 103, 246);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.8rem;
+        }
+
+        .home-btn {
+            background-color: rgb(105, 103, 246);
+            color: white;
+            border: 2px solid white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .home-btn:hover {
+            background-color: white;
+            color: rgb(105, 103, 246);
+            border-color: var(--primary-dark);
+        }
+
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2a2a2a;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo i {
+            color: #6c63ff;
+        }
+
+        .container {
+            padding: 6rem 5% 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* To-Do List Styles */
+        .todo-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .todo-header h1 {
+            color: #2a2a2a;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .todo-header p {
+            color: #666;
+        }
+
+        .todo-container {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .todo-column {
+            flex: 1;
+            min-width: 300px;
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .column-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .column-header h2 {
+            font-size: 1.3rem;
+            color: #2a2a2a;
+        }
+
+        .task-count {
+            background: #6c63ff;
+            color: white;
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+        }
+
+        .task-list {
+            list-style: none;
+            min-height: 100px;
+        }
+
+        .task-item {
+            background: #f8f7ff;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .task-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 10px rgba(108, 99, 255, 0.1);
+        }
+
+        .task-item.completed {
+            background: #f0f0f0;
+        }
+
+        .task-item.completed .task-text {
+            text-decoration: line-through;
+            color: #999;
+        }
+
+        .task-checkbox {
+            margin-right: 1rem;
+            width: 20px;
+            height: 20px;
+            accent-color: #6c63ff;
+            cursor: pointer;
+        }
+
+        .task-text {
+            flex: 1;
+            font-size: 0.95rem;
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .task-btn {
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .task-btn:hover {
+            color: #6c63ff;
+        }
+
+        .add-task-form {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .add-task-input {
+            flex: 1;
+            padding: 0.8rem;
+            border: 2px solid #eee;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+            width: 80%;
+        }
+
+        .add-task-input:focus {
+            outline: none;
+            border-color: #6c63ff;
+        }
+
+        .add-task-btn {
+            background: #6c63ff;
+            color: white;
+            padding: 0 1.5rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .add-task-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108, 99, 255, 0.3);
+        }
+
+        /* Priority Indicators */
+        .priority-high {
+            border-left: 4px solid #ff4444;
+        }
+
+        .priority-medium {
+            border-left: 4px solid #ffbb33;
+        }
+
+        .priority-low {
+            border-left: 4px solid #00C851;
+        }
+
+        /* Family Member Tags */
+        .member-tag {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            background: #e0e0ff;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            margin-top: 0.5rem;
+            color: #6c63ff;
+        }
+
+        /* Due Date Styling */
+        .due-date {
+            font-size: 0.7rem;
+            color: #666;
+            margin-top: 0.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .due-date.overdue {
+            color: #ff4444;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .todo-container {
+                flex-direction: column;
+            }
+            
+            .todo-header h1 {
+                font-size: 2rem;
+            }
+        }
+
+        .form-container {
+            text-align: center;
+            margin-top: 1.5rem;
+            background: #ffffff;
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(108, 99, 255, 0.1);
+        }
+        
+        .add-task-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .form-group {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .add-task-form input[type="text"],
+        .add-task-form select {
+            flex: 1;
+            padding: 0.8rem 1rem;
+            border: 2px solid #eee;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            width: 80%;
+        }
+        
+        .add-task-form input[type="text"]:focus,
+        .add-task-form select:focus {
+            outline: none;
+            border-color: #6c63ff;
+            box-shadow: 0 0 5px rgba(108, 99, 255, 0.3);
+        }
+        
+        .add-task-btn {
+            align-self: flex-start;
+            background: #6c63ff;
+            color: white;
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .add-task-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108, 99, 255, 0.3);
+        }        
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🌟 Personal Hub</h1>
+        <a href="{% url 'home' %}" class="home-btn">Home</a>
+    </header>
+    
+    <div class="container">
+        <div class="todo-header">
+            <h1>{{ user.username }}'s To-Do List</h1>
+            <p>Plan smart, Stay focused, Manage Today. Achieve Tomorrow</p>
+        </div>
+    
+        <div class="todo-container">
+            <!-- To Do Column -->
+            <div class="todo-column">
+                <div class="column-header">
+                    <h2>To Do</h2>
+                    <span class="task-count">{{ todo.count }}</span>
+                </div>
+                <ul class="task-list">
+                    {% for task in todo %}
+                    <li class="task-item priority-{{ task.priority }}">
+                        <input type="checkbox" class="task-checkbox"
+                            onclick="location.href='{% url 'toggle_task_status' task.id %}'">
+                        <div class="task-content">
+                            <div class="task-text">{{ task.text }}</div>
+                            {% if task.member %}
+                            <div class="member-tag">{{ task.member }}</div>
+                            {% endif %}
+                            {% if task.due_date %}
+                            <div class="due-date">
+                                <i class="fas fa-clock"></i> {{ task.due_date }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="task-actions">
+                            <a href="{% url 'delete_task' task.id %}" class="task-btn"><i class="fas fa-trash"></i></a>
+                        </div>
+                    </li>
+                    {% empty %}
+                    <li>No tasks here yet!</li>
+                    {% endfor %}
+                </ul>
+            </div>
+    
+            <!-- In Progress Column -->
+            <div class="todo-column">
+                <div class="column-header">
+                    <h2>In Progress</h2>
+                    <span class="task-count">{{ progress.count }}</span>
+                </div>
+                <ul class="task-list">
+                    {% for task in progress %}
+                    <li class="task-item priority-{{ task.priority }}">
+                        <input type="checkbox" class="task-checkbox"
+                            onclick="location.href='{% url 'toggle_task_status' task.id %}'">
+                        <div class="task-content">
+                            <div class="task-text">{{ task.text }}</div>
+                            {% if task.member %}
+                            <div class="member-tag">{{ task.member }}</div>
+                            {% endif %}
+                            {% if task.due_date %}
+                            <div class="due-date">
+                                <i class="fas fa-clock"></i> {{ task.due_date }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="task-actions">
+                            <a href="{% url 'delete_task' task.id %}" class="task-btn"><i class="fas fa-trash"></i></a>
+                        </div>
+                    </li>
+                    {% empty %}
+                    <li>No tasks here yet!</li>
+                    {% endfor %}
+                </ul>
+            </div>
+    
+            <!-- Completed Column -->
+            <div class="todo-column">
+                <div class="column-header">
+                    <h2>Completed</h2>
+                    <span class="task-count">{{ completed.count }}</span>
+                </div>
+                <ul class="task-list">
+                    {% for task in completed %}
+                    <li class="task-item priority-{{ task.priority }} completed">
+                        <input type="checkbox" class="task-checkbox"
+                            onclick="location.href='{% url 'toggle_task_status' task.id %}'"
+                            checked>
+                        <div class="task-content">
+                            <div class="task-text">{{ task.text }}</div>
+                            {% if task.member %}
+                            <div class="member-tag">{{ task.member }}</div>
+                            {% endif %}
+                            {% if task.due_date %}
+                            <div class="due-date">
+                                <i class="fas fa-clock"></i> {{ task.due_date }}
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="task-actions">
+                            <a href="{% url 'delete_task' task.id %}" class="task-btn"><i class="fas fa-trash"></i></a>
+                        </div>
+                    </li>
+                    {% empty %}
+                    <li>No completed tasks yet!</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-container">
+        <h1>ADD TASK</h1>
+        <form method="POST" action="{% url 'add_task' %}" class="add-task-form">
+            {% csrf_token %}
+            <div class="form-group">
+                {{ form.text }}
+                <div class="form-group">
+                    {{ form.priority }}
+                    {{ form.status }}
+                </div>
+            </div>
+            <div class="form-group">
+                {{ form.member }}
+            </div>
+            <button type="submit" class="add-task-btn">Add</button>
+        </form>
+    </div>    
+
+    <script>
+        // Task Management System
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load tasks from localStorage
+            let tasks = JSON.parse(localStorage.getItem('familyTasks')) || [];
+            
+            // Render all tasks
+            renderTasks();
+            
+            // Form submission handlers
+            document.getElementById('add-todo-form').addEventListener('submit', addTask);
+            document.getElementById('add-progress-form').addEventListener('submit', addTask);
+            
+            // Checkbox change handler
+            document.addEventListener('change', function(e) {
+                if (e.target.classList.contains('task-checkbox')) {
+                    const taskId = e.target.closest('.task-item').dataset.id;
+                    toggleTaskComplete(taskId);
+                }
+            });
+            
+            // Delete button handler
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('fa-trash')) {
+                    const taskId = e.target.closest('.task-item').dataset.id;
+                    deleteTask(taskId);
+                }
+                
+                if (e.target.classList.contains('fa-undo')) {
+                    const taskId = e.target.closest('.task-item').dataset.id;
+                    undoTask(taskId);
+                }
+            });
+            
+            function renderTasks() {
+                // Clear all lists
+                document.getElementById('todo-list').innerHTML = '';
+                document.getElementById('progress-list').innerHTML = '';
+                document.getElementById('completed-list').innerHTML = '';
+                
+                // Count tasks for each status
+                let todoCount = 0;
+                let progressCount = 0;
+                let completedCount = 0;
+                
+                // Render each task
+                tasks.forEach(task => {
+                    const taskElement = createTaskElement(task);
+                    
+                    if (task.status === 'todo') {
+                        document.getElementById('todo-list').appendChild(taskElement);
+                        todoCount++;
+                    } else if (task.status === 'progress') {
+                        document.getElementById('progress-list').appendChild(taskElement);
+                        progressCount++;
+                    } else if (task.status === 'completed') {
+                        document.getElementById('completed-list').appendChild(taskElement);
+                        completedCount++;
+                    }
+                });
+                
+                // Update counters
+                document.getElementById('todo-count').textContent = todoCount;
+                document.getElementById('progress-count').textContent = progressCount;
+                document.getElementById('completed-count').textContent = completedCount;
+            }
+            
+            function createTaskElement(task) {
+                const taskItem = document.createElement('li');
+                taskItem.className = `task-item priority-${task.priority}`;
+                taskItem.dataset.id = task.id;
+                
+                if (task.status === 'completed') {
+                    taskItem.classList.add('completed');
+                }
+                
+                taskItem.innerHTML = `
+                    <input type="checkbox" class="task-checkbox" ${task.status === 'completed' ? 'checked' : ''}>
+                    <div class="task-content">
+                        <div class="task-text">${task.text}</div>
+                        ${task.member ? `<div class="member-tag">${task.member}</div>` : ''}
+                        ${task.dueDate ? `
+                            <div class="due-date ${isOverdue(task.dueDate) ? 'overdue' : ''}">
+                                <i class="fas fa-clock"></i> ${formatDueDate(task.dueDate)}
+                            </div>
+                        ` : ''}
+                    </div>
+                    <div class="task-actions">
+                        ${task.status === 'completed' ? 
+                            '<button class="task-btn"><i class="fas fa-undo"></i></button>' : 
+                            '<button class="task-btn"><i class="fas fa-edit"></i></button>'
+                        }
+                        <button class="task-btn"><i class="fas fa-trash"></i></button>
+                    </div>
+                `;
+                
+                return taskItem;
+            }
+            
+            function addTask(e) {
+                e.preventDefault();
+                const input = e.target.querySelector('input');
+                const taskText = input.value.trim();
+                
+                if (taskText) {
+                    const status = e.target.id.includes('todo') ? 'todo' : 'progress';
+                    
+                    const newTask = {
+                        id: Date.now().toString(),
+                        text: taskText,
+                        status: status,
+                        priority: 'medium',
+                        createdAt: new Date().toISOString()
+                    };
+                    
+                    tasks.push(newTask);
+                    saveTasks();
+                    input.value = '';
+                }
+            }
+            
+            function toggleTaskComplete(taskId) {
+                const task = tasks.find(t => t.id === taskId);
+                if (task) {
+                    task.status = task.status === 'completed' ? 'todo' : 'completed';
+                    saveTasks();
+                }
+            }
+            
+            function deleteTask(taskId) {
+                tasks = tasks.filter(t => t.id !== taskId);
+                saveTasks();
+            }
+            
+            function undoTask(taskId) {
+                const task = tasks.find(t => t.id === taskId);
+                if (task) {
+                    task.status = 'todo';
+                    saveTasks();
+                }
+            }
+            
+            function saveTasks() {
+                localStorage.setItem('familyTasks', JSON.stringify(tasks));
+                renderTasks();
+            }
+            
+            function formatDueDate(dateString) {
+                const date = new Date(dateString);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                const diffTime = date - today;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                
+                if (diffDays === 0) return 'Today';
+                if (diffDays === 1) return 'Tomorrow';
+                if (diffDays === -1) return 'Yesterday';
+                if (diffDays < 0) return `${Math.abs(diffDays)} days ago`;
+                if (diffDays < 7) return `In ${diffDays} days`;
+                
+                return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            }
+            
+            function isOverdue(dateString) {
+                const date = new Date(dateString);
+                const today = new Date();
+                return date < today && !date.toDateString() === today.toDateString();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -34,3 +34,31 @@ class Budget(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.month}/{self.year} Budget"
+
+
+#todo part
+
+from django.db import models
+from django.contrib.auth.models import User
+
+PRIORITY_CHOICES = (
+    ('high', 'High'),
+    ('medium', 'Medium'),
+    ('low', 'Low'),
+)
+
+STATUS_CHOICES = (
+    ('todo', 'To Do'),
+    ('progress', 'In Progress'),
+)
+
+class Task(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    text = models.CharField(max_length=255, null=True)
+    priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='medium')
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='todo')
+    member = models.CharField(max_length=100, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.text

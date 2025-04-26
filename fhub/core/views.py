@@ -154,3 +154,46 @@ def delete_expense(request, expense_id):
     expense = get_object_or_404(Expense, id=expense_id, user=request.user)
     expense.delete()
     return redirect('expense-dashboard')
+
+
+#todo list part
+from django.shortcuts import render, redirect
+from .models import Task
+from .forms import TaskForm
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def todo_list(request):
+    tasks = Task.objects.filter(user=request.user)
+    todo = tasks.filter(status='todo')
+    progress = tasks.filter(status='progress')
+    completed = tasks.filter(status='completed')
+    form = TaskForm()
+    return render(request, 'todo.html', {
+        'todo': todo,
+        'progress': progress,
+        'completed': completed,
+        'form': form,
+    })
+
+@login_required
+def add_task(request):
+    if request.method == 'POST':
+        form = TaskForm(request.POST)
+        if form.is_valid():
+            task = form.save(commit=False)
+            task.user = request.user
+            task.save()
+    return redirect('todo_list')
+
+@login_required
+def delete_task(request, task_id):
+    Task.objects.filter(id=task_id, user=request.user).delete()
+    return redirect('todo_list')
+
+@login_required
+def toggle_task_status(request, task_id):
+    task = Task.objects.get(id=task_id, user=request.user)
+    task.status = 'completed' if task.status != 'completed' else 'todo'
+    task.save()
+    return redirect('todo_list')
