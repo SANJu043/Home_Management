@@ -51,7 +51,7 @@ def logout_view(request):
 #expenses part
 from .models import Expense, Budget
 from .forms import ExpenseForm, BudgetForm
-from django.db.models import Sum, Q
+from django.db.models import Sum
 from datetime import date
 from datetime import datetime, date
 import calendar
@@ -161,10 +161,8 @@ def delete_expense(request, expense_id):
 
 
 #todo list part
-from django.shortcuts import render, redirect
 from .models import Task
 from .forms import TaskForm
-from django.contrib.auth.decorators import login_required
 
 @login_required
 def todo_list(request):
@@ -206,7 +204,6 @@ def toggle_task_status(request, task_id):
 #notes part
 from .models import Note
 from .forms import NoteForm
-from django.contrib import messages
 
 @login_required
 def notes_dashboard(request):
@@ -255,7 +252,6 @@ def edit_note_view(request, note_id):
         form = NoteForm(request.POST, instance=note)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Note updated successfully!')
             return redirect('notes')
     else:
         form = NoteForm(instance=note)
@@ -268,7 +264,6 @@ def update_note_view(request, note_id):
         form = NoteForm(request.POST, instance=note)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Note updated successfully!')
             return redirect('notes')
     else:
         form = NoteForm(instance=note)
@@ -276,10 +271,8 @@ def update_note_view(request, note_id):
     return render(request, 'edit_note.html', {'form': form, 'note_to_edit': note})
 
 #calendar part
-from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from .models import CalendarEvent
-from django.contrib.auth.decorators import login_required
 import json
 from django.views.decorators.csrf import csrf_exempt
 
@@ -326,3 +319,43 @@ def delete_event(request, event_id):
         CalendarEvent.objects.filter(id=event_id, user=request.user).delete()
         return JsonResponse({'message': 'Event deleted successfully!'})
     return JsonResponse({'error': 'Invalid request'}, status=400)
+
+
+#invertory part
+from .models import InventoryItem
+from .forms import ItemForm
+
+@login_required
+def inventory_dashboard(request):
+    items = InventoryItem.objects.filter(user=request.user)
+    form = ItemForm()
+
+    if request.method == 'POST' and 'item_id' not in request.POST:
+        form = ItemForm(request.POST)
+        if form.is_valid():
+            item = form.save(commit=False)
+            item.user = request.user
+            item.save()
+            return redirect('inventory-dashboard')
+
+    context = {'items': items, 'form': form}
+    return render(request, 'inventory.html', context)
+
+@login_required
+def edit_item(request, item_id):
+    item = get_object_or_404(InventoryItem, id=item_id, user=request.user)
+    if request.method == 'POST':
+        form = ItemForm(request.POST, instance=item)
+        if form.is_valid():
+            form.save()
+            return redirect('inventory-dashboard')
+    else:
+        form = ItemForm(instance=item)
+    return redirect('inventory-dashboard')
+
+@login_required
+def delete_item(request, item_id):
+    item = get_object_or_404(InventoryItem, id=item_id, user=request.user)
+    if request.method == 'POST' or request.method == 'GET':
+        item.delete()
+    return redirect('inventory-dashboard')

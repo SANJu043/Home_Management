@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Inventory Management</title>
+
+  <!-- Fonts and Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
+  <style>
+    :root {
+      --primary-color: #6c63ff;
+      --primary-dark: #564fd8;
+      --primary-light: #e0deff;
+      --secondary-color: #ffb347;
+      --secondary-dark: #e69a2e;
+      --background: #f5f7fb;
+      --card-bg: #ffffff;
+      --text-color: #333;
+      --text-light: #666;
+      --success-color: #4caf50;
+      --warning-color: #ff9800;
+      --error-color: #f44336;
+      --border-color: #e0e0e0;
+      --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      --box-shadow-hover: 0 6px 16px rgba(0, 0, 0, 0.12);
+      --border-radius: 10px;
+      --transition: all 0.3s ease;
+    }
+
+    * {
+      margin: 0; padding: 0; box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background-color: var(--background);
+      color: var(--text-color);
+      line-height: 1.6;
+    }
+
+    header {
+      background-color: rgb(105, 103, 246);
+      color: white;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  }
+
+  header h1 {
+      margin: 0;
+      font-size: 1.8rem;
+  }
+
+  .home-btn {
+      background-color: rgb(105, 103, 246);
+      color: white;
+      border: 2px solid white;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-weight: 500;
+      text-decoration: none;
+      transition: background-color 0.3s, color 0.3s;
+  }
+
+  .home-btn:hover {
+      background-color: white;
+      color: rgb(105, 103, 246);
+      border-color: var(--primary-dark);
+  }
+
+    .container {
+      max-width: 1400px; margin: 2rem auto; padding: 0 1.5rem;
+    }
+
+    .page-header {
+      display: flex; justify-content: space-between;
+      align-items: center; margin-bottom: 2rem;
+      flex-wrap: wrap; gap: 1rem;
+    }
+
+    .page-title {
+      color: var(--primary-dark); font-size: 1.8rem;
+      font-weight: 600; position: relative;
+      padding-bottom: 0.5rem;
+    }
+    .page-title::after {
+      content: '';
+      position: absolute; bottom: 0; left: 0;
+      width: 50px; height: 3px;
+      background-color: var(--primary-color);
+      border-radius: 3px;
+    }
+
+    .search-form {
+      display: flex; gap: 0.5rem; max-width: 400px; width: 100%;
+    }
+    .search-input {
+      flex: 1; padding: 0.8rem 1rem;
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      background-color: var(--card-bg);
+      transition: var(--transition);
+    }
+    .search-input:focus {
+      outline: none; border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px var(--primary-light);
+    }
+    .search-btn {
+      background-color: var(--primary-color);
+      color: white; border: none;
+      padding: 0 1.5rem; border-radius: var(--border-radius);
+      cursor: pointer; transition: var(--transition);
+    }
+    .search-btn:hover { background-color: var(--primary-dark); }
+
+    .btn-secondary {
+      background-color: var(--secondary-color);
+      color: white; border: none;
+      padding: 0.5rem 1rem; border-radius: var(--border-radius);
+      cursor: pointer; transition: var(--transition);
+    }
+    .btn-secondary:hover {
+      background-color: var(--secondary-dark);
+    }
+
+    #itemFormContainer {
+      max-height: 0; overflow: hidden;
+      transition: max-height 0.5s ease-out;
+      background: var(--card-bg);
+      padding: 12px 32px 50px 32px;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      margin-bottom: 2rem;
+      position: relative;
+    }
+    #itemFormContainer.slide-show {
+      max-height: 800px;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%; padding: 0.8rem;
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      background: var(--background);
+    }
+    .form-group label {
+      display: block; margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+    .btn-save {
+      background-color: var(--primary-color);
+      color: white; padding: 0.8rem 2rem;
+      border: none; border-radius: var(--border-radius);
+      cursor: pointer; font-weight: 600;
+      transition: var(--transition);
+    }
+    .btn-save:hover {
+      background-color: var(--primary-dark);
+    }
+
+    .inventory-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .item-card {
+      background: var(--card-bg);
+      padding: 1.5rem;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      border-left: 4px solid var(--primary-color);
+      position: relative;
+      transition: var(--transition);
+    }
+    .item-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--box-shadow-hover);
+    }
+
+    .item-actions {
+      position: absolute;
+      top: 0.75rem;
+      right: 0.75rem;
+      display: flex;
+      gap: 0.5rem;
+      z-index: 1;
+    }
+    .action-btn {
+      background-color: var(--primary-light);
+      color: var(--primary-dark);
+      border: none;
+      border-radius: 50%;
+      width: 32px; height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+      cursor: pointer;
+      font-size: 1rem;
+    }
+    .action-btn.edit-btn:hover {
+      background-color: var(--primary-color);
+      color: white;
+    }
+    .action-btn.delete-btn:hover {
+      background-color: var(--error-color);
+      color: white;
+    }
+
+    .item-header {
+      font-weight: 600; font-size: 1.2rem;
+      color: var(--primary-dark); margin-bottom: 0.5rem;
+    }
+    .item-category {
+      display: inline-block;
+      background-color: var(--primary-light);
+      color: var(--primary-dark);
+      padding: 0.2rem 0.6rem;
+      border-radius: 50px;
+      font-size: 0.7rem; font-weight: 500;
+      margin-bottom: 0.5rem;
+    }
+    .item-meta { margin-top: 0.5rem; }
+    .meta-row { display: flex; justify-content: space-between; }
+    .meta-label { color: var(--text-light); }
+    .meta-value { font-weight: 500; }
+
+    /* Modal Styles */
+    .modal {
+      display: none; position: fixed; z-index: 1000;
+      top: 0; left: 0; width: 100%; height: 100%;
+      padding-top: 100px; background-color: rgba(0,0,0,0.5);
+    }
+    .modal-content {
+      background-color: var(--card-bg);
+      margin: auto; padding: 2rem;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      width: 90%; max-width: 500px;
+      position: relative;
+    }
+    .close-modal {
+      position: absolute; top: 1rem; right: 1rem;
+      font-size: 1.5rem; color: var(--text-light);
+      cursor: pointer; transition: var(--transition);
+    }
+    .close-modal:hover { color: var(--error-color); }
+
+    /* Close icon in Add New Item Form */
+    .close-add-form {
+      position: absolute;
+      top: 0.75rem;
+      right: 0.75rem;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      color: var(--text-light);
+      cursor: pointer;
+      transition: color 0.3s;
+    }
+    .close-add-form:hover {
+      color: var(--error-color);
+    }
+
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>{{ user.first_name }}'s Inventory</h1>
+    <a href="{% url 'home' %}" class="home-btn">Home</a>
+  </header>
+  <div class="container">
+    <div class="page-header">
+      <h2 class="page-title">Inventory Items</h2>
+      <div class="search-form">
+        <input id="searchInput" type="text" placeholder="Search items..." class="search-input"/>
+        <button id="searchBtn" class="search-btn"><i class="fas fa-search"></i></button>
+        <button id="toggleFormBtn" class="btn-secondary" style='border-radius: 50%'>
+          <h1><i class="fas fa-plus"></i></h1>
+        </button>
+      </div>
+    </div>
+
+    <!-- Add New Item Form -->
+    <div id="itemFormContainer">
+      <button id="closeAddFormBtn" class="close-add-form" title="Close form">&times;</button>
+      <h2 style="margin-bottom: 15px;">Add a New Item</h2>
+      <form method="POST">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="form-group">
+          {{ field.label_tag }}
+          {{ field }}
+          {% if field.errors %}
+            <div style="color:red;">{{ field.errors }}</div>
+          {% endif %}
+        </div>
+        {% endfor %}
+        <button type="submit" class="btn-save"><i class="fas fa-save"></i> Save</button>
+      </form>
+    </div>
+
+    <!-- Inventory List -->
+    <div id="inventoryGrid" class="inventory-grid">
+      {% for item in items %}
+      <div class="item-card" data-search="{{ item.name|lower }} {{ item.category|lower }}">
+        <div class="item-actions">
+          <button class="action-btn edit-btn"
+                  data-id="{{ item.id }}"
+                  data-name="{{ item.name }}"
+                  data-category="{{ item.category }}"
+                  data-quantity="{{ item.quantity }}"
+                  title="Edit">
+            <i class="fas fa-edit"></i>
+          </button>
+          <form method="POST" action="{% url 'item_delete' item.id %}" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="action-btn delete-btn" title="Delete">
+                <i class="fas fa-trash"></i>
+            </button>
+        </form>        
+        </div>
+        <div class="item-header">{{ item.name }}</div>
+        {% if item.category %}
+        <div class="item-category">{{ item.category }}</div>
+        {% endif %}
+        <div class="item-meta">
+          <div class="meta-row">
+            <span class="meta-label">Quantity:</span>
+            <span class="meta-value">{{ item.quantity }}</span>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Edit Modal -->
+  <div id="editModal" class="modal">
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <h2>Edit Item</h2>
+      <form id="editForm" method="POST" action="">
+        {% csrf_token %}
+        <input type="hidden" id="editItemId" name="item_id">
+        <div class="form-group">
+          <label for="editName">Name:</label>
+          <input type="text" id="editName" name="name" required>
+        </div>
+        <div class="form-group">
+          <label for="editCategory">Tag:</label>
+          <input type="text" id="editCategory" name="category">
+        </div>
+        <div class="form-group">
+          <label for="editQuantity">Quantity:</label>
+          <input type="number" id="editQuantity" name="quantity" required>
+        </div>
+        <button type="submit" class="btn-save">Save Changes</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Toggle Add Form
+    document.getElementById('toggleFormBtn').addEventListener('click', () => {
+      document.getElementById('itemFormContainer').classList.toggle('slide-show');
+    });
+
+    // Close Add Form
+    document.getElementById('closeAddFormBtn').addEventListener('click', () => {
+      document.getElementById('itemFormContainer').classList.remove('slide-show');
+    });
+
+    // Search & Filter
+    const searchInput = document.getElementById('searchInput');
+    const searchBtn = document.getElementById('searchBtn');
+    const itemCards = document.querySelectorAll('.item-card');
+    
+    function filterItems() {
+      const term = searchInput.value.toLowerCase();
+      itemCards.forEach(card => {
+        const searchText = card.dataset.search;
+        card.style.display = searchText.includes(term) ? 'block' : 'none';
+      });
+    }
+    
+    searchBtn.addEventListener('click', filterItems);
+    searchInput.addEventListener('keyup', e => {
+      if (e.key === 'Enter') filterItems();
+    });
+
+    // Edit Modal Logic
+    const editModal = document.getElementById('editModal');
+    const closeModal = document.querySelector('.close-modal');
+    
+    document.querySelectorAll('.edit-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.getElementById('editItemId').value = btn.dataset.id;
+        document.getElementById('editName').value = btn.dataset.name;
+        document.getElementById('editCategory').value = btn.dataset.category;
+        document.getElementById('editQuantity').value = btn.dataset.quantity;
+        document.getElementById('editForm').action = `/editt/${btn.dataset.id}/`;
+        editModal.style.display = 'block';
+      });
+    });
+    
+    closeModal.addEventListener('click', () => {
+      editModal.style.display = 'none';
+    });
+    
+    window.addEventListener('click', e => {
+      if (e.target === editModal) {
+        editModal.style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>

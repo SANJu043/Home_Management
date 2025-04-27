@@ -262,7 +262,65 @@
       background-color: var(--primary-dark);
     }
 
-    /* Other existing styles */
+    /* Styling for Edit Note Form */
+    #editForm {
+      margin-top: 1rem;
+      padding: 1rem;
+      border-top: 1px solid #ddd;
+      background-color: var(--background);
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    #editForm label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: var(--primary-dark);
+    }
+
+    #editForm input,
+    #editForm textarea {
+      width: 95%;
+      padding: 0.8rem;
+      border: 1px solid #ccc;
+      border-radius: var(--border-radius);
+      margin-bottom: 1rem;
+      font-family: inherit;
+      font-size: 1rem;
+      background-color: var(--card-bg);
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    #editForm input:focus,
+    #editForm textarea:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 5px var(--primary-light);
+      outline: none;
+    }
+
+    #editForm button {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: var(--border-radius);
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    #editForm button:hover {
+      background-color: var(--primary-dark);
+    }
+
+    /* Fade-in animation */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
   </style>
 </head>
 <body>

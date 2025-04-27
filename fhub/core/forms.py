@@ -66,3 +66,22 @@ class NoteForm(forms.ModelForm):
             'content': forms.Textarea(attrs={'rows': 5, 'placeholder': 'Write your note here...'}),
             'color': forms.Select(choices=[('red', 'Red'), ('blue', 'Blue'), ('yellow', 'Yellow'), ('green', 'Green')]),
         }
+
+
+#invertory part
+from .models import InventoryItem
+
+class RegisterForm(UserCreationForm):
+    email = forms.EmailField(required=True)
+
+    class Meta:
+        model = User
+        fields = ["username", "email", "password1", "password2"]
+
+class ItemForm(forms.ModelForm):
+    class Meta:
+        model = InventoryItem
+        fields = ['name', 'category', 'quantity',]
+        widgets = {
+            'category': forms.TextInput(attrs={'placeholder': 'Enter tag or category of item (YOUR CHOICE)'})
+        }

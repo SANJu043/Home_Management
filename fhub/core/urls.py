@@ -28,4 +28,8 @@ urlpatterns = [
     path('api/events/', views.get_events, name='get_events'),
     path('api/events/add/', views.add_event, name='add_event'),
     path('api/events/delete/<int:event_id>/', views.delete_event, name='delete_event'),
+
+    path('inventory/', views.inventory_dashboard, name='inventory-dashboard'),
+    path('editt/<int:item_id>/', views.edit_item, name='item_edit'),
+    path('deletee/<int:item_id>/', views.delete_item, name='item_delete'),
 ]

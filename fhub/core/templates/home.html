@@ -137,11 +137,29 @@
         .card a:hover {
             text-decoration: underline;
         }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo i {
+            font-size: 1.5rem;
+        }
     </style>
 </head>
 <body>
     <header>
-        <h1>🌟 Hello, {{ user.first_name }}! Welcome to your Personal Hub</h1>
+        <h1>🌟 Hello, {{ user.first_name }}!</h1>
+        <a href="{% url 'home' %}" class="logo">
+            <i class="fas fa-tasks"></i>
+            <span>LifeFlow</span>
+        </a>
         <a href="{% url 'logout' %}" class="logout-btn">Logout</a>
     </header>
 
@@ -169,8 +187,7 @@
             <div class="card">
                 <i class="fas fa-boxes-stacked"></i>
                 <h3>My Essentials</h3>
-                <a href="#">Check Invertory</a>
-                {% comment %} <a href="{% url 'inventory' %}">Check Inventory</a> {% endcomment %}
+                <a href="{% url 'inventory-dashboard' %}">Check Inventory</a>
             </div>
             <div class="card">
                 <i class="fas fa-calendar-alt"></i>
