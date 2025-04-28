@@ -155,11 +155,11 @@
 </head>
 <body>
     <header>
-        <h1>🌟 Hello, {{ user.first_name }}!</h1>
         <a href="{% url 'home' %}" class="logo">
             <i class="fas fa-tasks"></i>
             <span>LifeFlow</span>
         </a>
+        <h1>🌟 Hello, {{ user.first_name }}!</h1>
         <a href="{% url 'logout' %}" class="logout-btn">Logout</a>
     </header>
 

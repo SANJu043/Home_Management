@@ -346,68 +346,7 @@
             font-size: 1.2rem;
             opacity: 0.9;
         }
-
-        /* Testimonials */
-        .testimonials {
-            padding: 6rem 5%;
-            background: var(--light-gray);
-        }
-
-        .testimonial-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin-top: 3rem;
-        }
-
-        .testimonial-card {
-            background: var(--white);
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: var(--box-shadow);
-            position: relative;
-        }
-
-        .testimonial-card::before {
-            content: '"';
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            font-size: 5rem;
-            color: var(--primary-color);
-            opacity: 0.1;
-            font-family: serif;
-            line-height: 1;
-        }
-
-        .testimonial-content {
-            margin-bottom: 1.5rem;
-            position: relative;
-            z-index: 1;
-        }
-
-        .testimonial-author {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .author-avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-
-        .author-info h4 {
-            font-size: 1.1rem;
-            margin-bottom: 0.2rem;
-        }
-
-        .author-info p {
-            font-size: 0.9rem;
-            color: var(--gray-color);
-        }
+        
 
         /* CTA Section */
         .cta-section {
@@ -650,7 +589,6 @@
         <div class="nav-links">
             <a href="#features">Features</a>
             <a href="#stats">Stats</a>
-            <a href="#testimonials">Testimonials</a>
             <a href="#contact">Contact</a>
         </div>
         <div class="mobile-menu-btn">
@@ -679,39 +617,34 @@
             <div class="features-grid">
                 <div class="feature-card">
                     <i class="fas fa-calendar-alt feature-icon"></i>
-                    <h3>Smart Scheduling</h3>
-                    <p>Plan your days with an intelligent calendar that suggests optimal times for tasks based on your habits.</p>
+                    <h3>Scheduling</h3>
+                    <p>Plan your days with an calendar by adding reminders and schedule events</p>
                 </div>
                 
                 <div class="feature-card">
                     <i class="fas fa-tasks feature-icon"></i>
-                    <h3>Task Automation</h3>
-                    <p>Create recurring tasks, set priorities, and track completion with smart reminders and analytics.</p>
+                    <h3>Task Management</h3>
+                    <p>Create  tasks, set priorities, add tags, and track completion</p>
                 </div>
                 
                 <div class="feature-card">
                     <i class="fas fa-chart-line feature-icon"></i>
-                    <h3>Goal Tracking</h3>
-                    <p>Set and monitor personal goals with progress visualization and milestone celebrations.</p>
+                    <h3>Inventory</h3>
+                    <p>Keep track of your items. What you have and what you don't.</p>
                 </div>
                 
                 <div class="feature-card">
                     <i class="fas fa-wallet feature-icon"></i>
                     <h3>Personal Finance</h3>
-                    <p>Track expenses, set budgets, and analyze spending patterns with intuitive dashboards.</p>
+                    <p>Track expenses, set budgets, and analyze spending patterns with intuitive dashboards</p>
                 </div>
                 
                 <div class="feature-card">
                     <i class="fas fa-book feature-icon"></i>
                     <h3>Knowledge Base</h3>
-                    <p>Organize notes, documents, and resources with powerful search and tagging capabilities.</p>
+                    <p>Organize notes or important texts with a better preview.</p>
                 </div>
                 
-                <div class="feature-card">
-                    <i class="fas fa-heartbeat feature-icon"></i>
-                    <h3>Wellness Tracker</h3>
-                    <p>Monitor health habits, exercise routines, and mindfulness practices in one integrated system.</p>
-                </div>
             </div>
         </div>
     </section>
@@ -720,65 +653,16 @@
     <section class="stats" id="stats">
         <div class="stats-container">
             <div class="stat-item">
-                <div class="stat-number">87%</div>
+                <div class="stat-number">%&gt0</div>
                 <div class="stat-label">Productivity Increase</div>
             </div>
             <div class="stat-item">
-                <div class="stat-number">15+</div>
+                <div class="stat-number">0+</div>
                 <div class="stat-label">Hours Saved Weekly</div>
             </div>
             <div class="stat-item">
-                <div class="stat-number">24/7</div>
-                <div class="stat-label">Support</div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Testimonials Section -->
-    <section class="testimonials" id="testimonials">
-        <div class="container">
-            <h2 class="section-title">Success Stories</h2>
-            <p class="section-subtitle">How LifeFlow has transformed personal organization</p>
-            
-            <div class="testimonial-grid">
-                <div class="testimonial-card">
-                    <div class="testimonial-content">
-                        <p>LifeFlow completely changed how I manage my time. I've gone from constantly feeling overwhelmed to being in complete control of my schedule and priorities.</p>
-                    </div>
-                    <div class="testimonial-author">
-                        <img src="https://randomuser.me/api/portraits/women/32.jpg" alt="Jessica Tan" class="author-avatar">
-                        <div class="author-info">
-                            <h4>Jessica Tan</h4>
-                            <p>Entrepreneur</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="testimonial-card">
-                    <div class="testimonial-content">
-                        <p>The goal tracking feature helped me finally achieve my fitness targets after years of failed attempts. The progress visualization kept me motivated.</p>
-                    </div>
-                    <div class="testimonial-author">
-                        <img src="https://randomuser.me/api/portraits/men/45.jpg" alt="David Park" class="author-avatar">
-                        <div class="author-info">
-                            <h4>David Park</h4>
-                            <p>Fitness Enthusiast</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="testimonial-card">
-                    <div class="testimonial-content">
-                        <p>As a freelancer, LifeFlow's integrated task and finance management has saved me countless hours and helped me grow my business by 30% this year.</p>
-                    </div>
-                    <div class="testimonial-author">
-                        <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Maria Gonzalez" class="author-avatar">
-                        <div class="author-info">
-                            <h4>Maria Gonzalez</h4>
-                            <p>Freelance Designer</p>
-                        </div>
-                    </div>
-                </div>
+                <div class="stat-number">Life</div>
+                <div class="stat-label">Made Easier</div>
             </div>
         </div>
     </section>
@@ -798,7 +682,7 @@
             <div class="footer-grid">
                 <div class="footer-about">
                     <a href="#" class="footer-logo">LifeFlow</a>
-                    <p>The ultimate personal management system designed to help you organize, optimize, and achieve more.</p>
+                    <p>The personal management system designed to help you organize, optimize, and achieve more.</p>
                     <div class="social-links">
                         <a href="#"><i class="fab fa-facebook-f"></i></a>
                         <a href="#"><i class="fab fa-twitter"></i></a>
@@ -810,10 +694,10 @@
                 <div class="footer-links">
                     <h3>Features</h3>
                     <ul>
-                        <li><a href="#">Smart Scheduling</a></li>
-                        <li><a href="#">Task Automation</a></li>
-                        <li><a href="#">Goal Tracking</a></li>
-                        <li><a href="#">Personal Finance</a></li>
+                        <li><a href="#">Scheduling</a></li>
+                        <li><a href="#">Task Manging</a></li>
+                        <li><a href="#">Expense Tracking</a></li>
+                        <li><a href="#">Inventory</a></li>
                     </ul>
                 </div>
                 
