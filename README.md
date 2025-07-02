@@ -55,20 +55,25 @@ fhub/
 ## ⚙️ Setup Instructions
 
 ### 1. Clone the Repository
-bash
+```bash
 -> git clone https://github.com/SANJu043/Home_Management
 -> cd fhub
-
-### 2. Create a Virtual Environment 
+```
+### 2. Create a Virtual Environment
+```bash
 python -m venv venv
-On mac: source venv/bin/activate  # On Windows: venv\Scripts\activate
-
+On mac: source venv/bin/activate
+On Windows: venv\Scripts\activate
+```
 ### 3. install django
+```bash
 pip install django
-
+```
 ### 4. run the project
-(use python3 if you have)
+(use python3 if you have)  
+```bash
 python manage.py migrate
 python manage.py runserver
+```
 
-Then go to http://127.0.0.1:8000/ in your browser.
+Then go to http://127.0.0.1:8000/ in your browser.  
