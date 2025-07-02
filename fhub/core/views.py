@@ -4,27 +4,34 @@ from django.contrib.auth import authenticate, login, logout
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-# Create your views here.
+
+# ----------------------------- Authentication Views -----------------------------
 
 @login_required
 def home_views(request):
+    #home page view after login
     return render(request, 'home.html')
 
 def land_view(request):
+    #landing page view (doesn't need login)
     return render(request, 'landing.html')
 
 @csrf_protect
 def signup_view(request):
+    #Creating user account view
     form = SignUpForm()
     if request.method == 'POST':
+        #if post request then authenticates and creates account
         form = SignUpForm(request.POST)
         if form.is_valid():
             user = form.save()
-            # login(request, user)
+            # login(request, user) (naive) | redirecting again to login page is better
             return redirect('login') 
+    #if the user is just viewing the signup page
     return render(request, 'signup.html', {'form': form})
 
 def login_view(request):
+    #user login view
     form = LoginForm()
     if request.method == 'POST':
         form = LoginForm(request.POST)
@@ -32,6 +39,7 @@ def login_view(request):
             email = form.cleaned_data['email']
             password = form.cleaned_data['password']
             try:
+                #Instead of using default username login using email to find user acc and login indirectly as email is easier to remember
                 user = User.objects.get(email=email)
                 user = authenticate(request, username=user.username, password=password)
                 if user is not None:
@@ -40,15 +48,17 @@ def login_view(request):
                 else:
                     form.add_error(None, 'Invalid email or password.')
             except User.DoesNotExist:
+                #error handling
                 form.add_error('email', 'No account found with this email.')
     return render(request, 'login.html', {'form': form})
 
 def logout_view(request):
+    #using default logout in djanog-authentication
     logout(request)
     return redirect('login')
 
+# ----------------------------- Expense Views -----------------------------
 
-#expenses part
 from .models import Expense, Budget
 from .forms import ExpenseForm, BudgetForm
 from django.db.models import Sum
@@ -58,11 +68,14 @@ import calendar
 
 @login_required
 def expense_dashboard(request):
+    #retrieving the user specific expenses
     expenses = Expense.objects.filter(user=request.user).order_by('-date')
 
+    #getting the start and end date from filter bar form for filtering
     start_date = request.GET.get('start_date')
     end_date = request.GET.get('end_date')
 
+    #for default filter bar (no user input in filter)
     current_year = date.today().year
     current_month = date.today().month
 
@@ -104,6 +117,7 @@ def expense_dashboard(request):
     total_expenses = expenses.aggregate(Sum('amount'))['amount__sum'] or 0
     balance = total_budget - total_expenses
 
+    #category summary for the pie chart visualisation
     category_summary = expenses.values('category').annotate(total=Sum('amount')).order_by('category')
 
     month_labels = [calendar.month_name[i] for i in range(1, 13)]
@@ -113,6 +127,7 @@ def expense_dashboard(request):
         for month in range(1, 13)
     ]
 
+    #handling the forms adding expense and updating budget
     if request.method == 'POST':
         if 'add_expense' in request.POST:
             expense_form = ExpenseForm(request.POST)
@@ -137,6 +152,7 @@ def expense_dashboard(request):
         expense_form = ExpenseForm()
         budget_form = BudgetForm()
 
+    #mapping the variables here to html
     context = {
         'expenses': expenses,
         'budget': total_budget,
@@ -155,17 +171,19 @@ def expense_dashboard(request):
 
 @login_required
 def delete_expense(request, expense_id):
+    #finding expense using requested expense id and delete
     expense = get_object_or_404(Expense, id=expense_id, user=request.user)
     expense.delete()
     return redirect('expense-dashboard')
 
+# ----------------------------- To DO list Views -----------------------------
 
-#todo list part
 from .models import Task
 from .forms import TaskForm
 
 @login_required
 def todo_list(request):
+    #filtering the tasks of user form database
     tasks = Task.objects.filter(user=request.user)
     todo = tasks.filter(status='todo')
     progress = tasks.filter(status='progress')
@@ -183,6 +201,7 @@ def add_task(request):
     if request.method == 'POST':
         form = TaskForm(request.POST)
         if form.is_valid():
+            #commit = false allows to change the object before saving it to database
             task = form.save(commit=False)
             task.user = request.user
             task.save()
@@ -200,19 +219,20 @@ def toggle_task_status(request, task_id):
     task.save()
     return redirect('todo_list')
 
+# ----------------------------- Notes Views -----------------------------
 
-#notes part
 from .models import Note
 from .forms import NoteForm
 
 @login_required
 def notes_dashboard(request):
+    #notes page view
     notes = Note.objects.filter(user=request.user, archived=False).order_by('-pinned', '-updated_at')
-    archived_notes = Note.objects.filter(user=request.user, archived=True)
 
     if request.method == 'POST':
         form = NoteForm(request.POST)
         if form.is_valid():
+            #commit = false allows to change the object before saving it to database
             note = form.save(commit=False)
             note.user = request.user
             note.save()
@@ -234,12 +254,14 @@ def delete_note(request, note_id):
 
 @login_required
 def toggle_pin(request, note_id):
+    #pin the notes to important(displays first)
     note = get_object_or_404(Note, id=note_id, user=request.user)
     note.pinned = not note.pinned
     note.save()
     return redirect('notes-dashboard')
 @login_required
 def toggle_favorite(request, note_id):
+    #toggling the note to favourite
     note = get_object_or_404(Note, id=note_id, user=request.user)
     note.is_favorite = not note.is_favorite
     note.save()
@@ -270,7 +292,8 @@ def update_note_view(request, note_id):
 
     return render(request, 'edit_note.html', {'form': form, 'note_to_edit': note})
 
-#calendar part
+# ----------------------------- Calendar Views -----------------------------
+
 from django.http import JsonResponse
 from .models import CalendarEvent
 import json
@@ -278,10 +301,11 @@ from django.views.decorators.csrf import csrf_exempt
 
 @login_required
 def calendar_page(request):
-    return render(request, 'calendar.html')  # Use your HTML code here
+    return render(request, 'calendar.html') 
 
 @login_required
 def get_events(request):
+    # brings all the user marked events
     events = CalendarEvent.objects.filter(user=request.user)
     events_data = [
         {
@@ -320,13 +344,14 @@ def delete_event(request, event_id):
         return JsonResponse({'message': 'Event deleted successfully!'})
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
+# ----------------------------- Inventory Views -----------------------------
 
-#invertory part
 from .models import InventoryItem
 from .forms import ItemForm
 
 @login_required
 def inventory_dashboard(request):
+    #inventory page views
     items = InventoryItem.objects.filter(user=request.user)
     form = ItemForm()
 

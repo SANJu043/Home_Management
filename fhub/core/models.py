@@ -1,7 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import User
+#model is special kind of object or class about our required data
+
+# ----------------------------- Expenses Models -----------------------------
 
 class Expense(models.Model):
+    #Expense model
     CATEGORY_CHOICES = [
         ('Food', 'Food'),
         ('Housing', 'Housing'),
@@ -24,6 +28,7 @@ class Expense(models.Model):
         return self.description
 
 class Budget(models.Model):
+    #Budget model(month specific)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     year = models.IntegerField()
     month = models.IntegerField()
@@ -36,7 +41,7 @@ class Budget(models.Model):
         return f"{self.user.username} - {self.month}/{self.year} Budget"
 
 
-#todo part
+# ----------------------------- TO DO LIST model -----------------------------
 
 from django.db import models
 from django.contrib.auth.models import User
@@ -53,6 +58,7 @@ STATUS_CHOICES = (
 )
 
 class Task(models.Model):
+    #task model
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     text = models.CharField(max_length=255, null=True)
     priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default='medium')
@@ -63,7 +69,7 @@ class Task(models.Model):
     def __str__(self):
         return self.text
     
-#notes part
+# ----------------------------- Notes Model -----------------------------
 
 class Note(models.Model):
     COLOR_CHOICES = [
@@ -91,7 +97,8 @@ class Note(models.Model):
         return self.title
     
 
-#calendar part
+# ----------------------------- Calendar model -----------------------------
+
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
@@ -107,7 +114,8 @@ class CalendarEvent(models.Model):
     def __str__(self):
         return self.title
     
-#invertory part
+# ----------------------------- Inventory Model -----------------------------
+
 from django.db import models
 from django.contrib.auth.models import User
 

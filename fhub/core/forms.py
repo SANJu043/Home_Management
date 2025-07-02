@@ -2,6 +2,9 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
+# ----------------------------- Authentication forms -----------------------------
+
+#signup form or account creation form
 class SignUpForm(UserCreationForm):
     username = forms.CharField(required=True,widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Username'}))
     first_name = forms.CharField(required=True,widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'First Name'}))
@@ -14,12 +17,12 @@ class SignUpForm(UserCreationForm):
     class Meta:
         model = User
         fields = ['username', 'first_name', 'last_name', 'date_of_birth', 'email', 'password1', 'password2']
-
+#login form
 class LoginForm(forms.Form):
     email = forms.EmailField(widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email'}))
     password = forms.CharField(widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Password'}))
 
-#expenses part
+# ----------------------------- Expenses Forms -----------------------------
 from django.utils.timezone import now
 from .models import Expense, Budget
 
@@ -40,7 +43,7 @@ class BudgetForm(forms.ModelForm):
         model = Budget
         fields = ['year', 'month', 'amount']
 
-#todo part
+# ----------------------------- ToDo Form -----------------------------
 from .models import Task
 
 class TaskForm(forms.ModelForm):
@@ -55,7 +58,7 @@ class TaskForm(forms.ModelForm):
         }
 
 
-#notes part
+# ----------------------------- Notes Form -----------------------------
 from .models import Note
 
 class NoteForm(forms.ModelForm):
@@ -68,7 +71,7 @@ class NoteForm(forms.ModelForm):
         }
 
 
-#invertory part
+# ----------------------------- Inventory Form -----------------------------
 from .models import InventoryItem
 
 class ItemForm(forms.ModelForm):
