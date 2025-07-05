@@ -1,8 +1,9 @@
-# 🗂️ FHub — Personal Management Web App
+# 🗂️ LifeFlow — Personal Management Web App
 
-FHub is a personal productivity and management platform built with Django. It integrates essential tools like a to-do list, expense tracker, notes app, calendar, and inventory system — all under one dashboard.
+LifeFlow is a personal productivity and management platform built with Django. It integrates essential tools like a to-do list, expense tracker, notes app, calendar, and inventory system — all under one dashboard.
 
 ---
+(fhub had full basic app)
 
 ## 🚀 Features
 
